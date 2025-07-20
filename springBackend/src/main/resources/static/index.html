@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ToDo App</title>
+</head>
+<body>
+  <h1>Add Activity</h1>
+  <form id="activity-form">
+    <input type="text" id="activity" placeholder="New activity" required />
+    <button type="submit">Add</button>
+  </form>
+
+  <h2>All Activities</h2>
+  <ul id="activity-list"></ul>
+
+  <script>
+    async function loadActivities() {
+      const res = await fetch("/list");
+      const activities = await res.json();
+
+      const list = document.getElementById("activity-list");
+      list.innerHTML = "";
+      activities.forEach(activity => {
+        const li = document.createElement("li");
+        li.textContent = activity.name;
+        list.appendChild(li);
+      });
+    }
+
+    const form = document.getElementById("activity-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("activity").value;
+      await fetch("/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+      form.reset();
+      loadActivities(); // refresh list
+    });
+
+    loadActivities(); // initial load
+  </script>
+</body>
+</html>
+
